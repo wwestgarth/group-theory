@@ -1,5 +1,8 @@
 package groups
 
+// TODO: Fix isgenerator check
+// TODO: add function comments
+
 import (
 	"fmt"
 )
@@ -56,7 +59,7 @@ func (g *Group) isgenerator(e Element) bool{
 	}
 
 	if g.equals(e, g.Operate(e, e)) {
-		return false // element is the identity
+		return false // element is the identity...or its own inverse
 	}
 
 	var current = e
@@ -64,6 +67,7 @@ func (g *Group) isgenerator(e Element) bool{
 	// Or a generator of a sub-group.
 	for i := 0; i < len(g.elements); i++ {
 		current = g.Operate(e, current)
+		if
 	}
 	
 	return g.equals(e, current)
