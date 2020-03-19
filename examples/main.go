@@ -37,4 +37,7 @@ func main() {
 
 	explicit.Add(set)
 	explicit.Details()
+
+	explicit.Analyse()
+	explicit.Details()
 }

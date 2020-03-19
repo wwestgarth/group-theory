@@ -49,14 +49,57 @@ func (g *Group) Generate(generator Element, max_order int) bool {
 	return found
 }
 
-func (g *Group) Operate(a, b Element) Element {
-	return g.operator(a, b)
+func (g *Group) isgenerator(e Element) bool{
+
+	if g.generator != nil {
+		return g.equals(g.generator, e) // Already cached
+	}
+
+	if g.equals(e, g.Operate(e, e)) {
+		return false // element is the identity
+	}
+
+	var current = e
+	// Not quite right, this is either give the generator of the group
+	// Or a generator of a sub-group.
+	for i := 0; i < len(g.elements); i++ {
+		current = g.Operate(e, current)
+	}
+	
+	return g.equals(e, current)
+}
+
+func (g *Group) ensuregenerator() {
+
+	if g.generator != nil {
+		fmt.Println("Early")
+		fmt.Println(g.generator)
+		return
+	}
+	
+	for element := range g.elements {
+		if g.isgenerator(element) {
+			g.generator = element
+			return
+		}
+	}
+
+}
+
+func (g *Group) Analyse()  {
+
+	g.ensuregenerator()
+
 }
 
 func (g *Group) Details() {
 	fmt.Println("Group Details");
 	fmt.Println("Order    :", len(g.elements));
 	fmt.Println("Generator:", g.generator);
+}
+
+func (g *Group) Operate(a, b Element) Element {
+	return g.operator(a, b)
 }
 
 func New(op *GroupOperation, eq *GroupEquals) Group {
