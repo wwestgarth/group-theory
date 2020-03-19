@@ -1,10 +1,5 @@
 package groups
 
-import (
-	"fmt"
-)
-
-
 type Element interface {
 }
 
@@ -15,23 +10,18 @@ type Group struct {
 	operator GroupOperation
 }
 
-func (g Group) Add(elements []Element) {
+func (g *Group) Add(elements []Element) {
 
 	for _, element := range elements {
-		fmt.Println("Adding", element)
 		g.elements[element] = true
 	}
 }
 
-func (g Group) RegisterOperation(operation *GroupOperation) {
+func (g *Group) RegisterOperation(operation *GroupOperation) {
 	g.operator = *operation
-	fmt.Println(g.operator)
-
 }
 
-func (g Group) Operate(a, b Element) Element {
-	fmt.Println("Operate")
-	fmt.Println(g.operator)
+func (g *Group) Operate(a, b Element) Element {
 	return g.operator(a,b)
 }
 
