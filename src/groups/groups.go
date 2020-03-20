@@ -3,7 +3,6 @@ package groups
 // TODO: Fix isgenerator check
 // TODO: Confirm whether identity check is correct
 // TODO: Fix that a generator is non-unique
-// TODO: add function comments
 // Error handle, with proper error return types
 
 import (
@@ -24,6 +23,7 @@ type Group struct {
 	cayleytable map[Element]map[Element]bool
 }
 
+// Add adds the given slice to the Group. These are the members of the Group.
 func (g *Group) Add(elements []Element) {
 
 	for _, element := range elements {
@@ -31,6 +31,9 @@ func (g *Group) Add(elements []Element) {
 	}
 }
 
+// Generate Attempts to generates a group from the given generator. If more
+// than 'max_order' elements are added to the Group then we group generate
+// is stopped.
 func (g *Group) Generate(generator Element, max_order int) bool {
 
 	found := false
@@ -56,17 +59,19 @@ func (g *Group) Generate(generator Element, max_order int) bool {
 	return found
 }
 
-func (g *Group) isidentity(e Element) bool {
+// isIdentity returns true if the given Element is the Group's Identity
+func (g *Group) isIdentity(e Element) bool {
 	return g.equals(e, g.Operate(e, e)) // Unsure if this is sufficient
 }
 
-func (g *Group) isgenerator(e Element) bool {
+// isGenerator returns true if the given Element is a geneartor of the Group
+func (g *Group) isGenerator(e Element) bool {
 
 	if g.generator != nil {
 		return g.equals(g.generator, e) // Already cached
 	}
 
-	if g.isidentity(e) {
+	if g.isIdentity(e) {
 		return false // element is the identity
 	}
 
@@ -80,39 +85,45 @@ func (g *Group) isgenerator(e Element) bool {
 	return g.equals(e, current)
 }
 
-func (g *Group) ensuregenerator() {
+// ensureGenerator ensures the Group's generator field is known
+func (g *Group) ensureGenerator() {
 
 	if g.generator != nil {
 		return
 	}
 
 	for element := range g.elements {
-		if g.isgenerator(element) {
+		if g.isGenerator(element) {
 			g.generator = element
 			return
 		}
 	}
-
 }
 
+// Analyse checks the given Group's elements and Operation satisies the axioms
+// of Group Theory
 func (g *Group) Analyse() {
 
-	fmt.Println("Closed:", g.check_closure())
+	fmt.Println("Closed:", g.checkClosure())
 
-	g.ensuregenerator()
+	g.ensureGenerator()
 
 }
 
+// Details prints all know details of the Group
 func (g *Group) Details() {
 	fmt.Println("Group Details")
 	fmt.Println("Order    :", len(g.elements))
 	fmt.Println("Generator:", g.generator)
 }
 
+// Operate executes the Group's registered operator
 func (g *Group) Operate(a, b Element) Element {
 	return g.operator(a, b)
 }
 
+// Operate returns a new instance of a Group. Requires an Groups operation
+// and a means of element equality. 
 func New(op *GroupOperation, eq *GroupEquals) Group {
 	var g Group
 	g.elements = make(map[Element]bool)

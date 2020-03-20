@@ -1,6 +1,8 @@
 package groups
 
-func (g *Group) check_closure() bool {
+// checkClosure checks whether the elements in the Group acted on
+// by the Group's Operator is closed 
+func (g *Group) checkClosure() bool {
 
 	g.cayleytable = make(map[Element]map[Element]bool)
 
