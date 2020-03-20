@@ -4,6 +4,7 @@ package groups
 // TODO: Confirm whether identity check is correct
 // TODO: Fix that a generator is non-unique
 // TODO: add function comments
+// Error handle, with proper error return types
 
 import (
 	"fmt"
@@ -16,10 +17,11 @@ type GroupOperation func(Element, Element) Element
 type GroupEquals func(Element, Element) bool
 
 type Group struct {
-	elements  map[Element]bool
-	operator  GroupOperation
-	equals    GroupEquals
-	generator Element
+	elements    map[Element]bool
+	operator    GroupOperation
+	equals      GroupEquals
+	generator   Element
+	cayleytable map[Element]map[Element]bool
 }
 
 func (g *Group) Add(elements []Element) {
@@ -94,6 +96,8 @@ func (g *Group) ensuregenerator() {
 }
 
 func (g *Group) Analyse() {
+
+	fmt.Println("Closed:", g.check_closure())
 
 	g.ensuregenerator()
 

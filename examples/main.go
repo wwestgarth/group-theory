@@ -7,9 +7,11 @@ import (
 
 func goperation(a, b groups.Element) groups.Element {
 
-	aval := reflect.ValueOf(a).Int()
-	bval := reflect.ValueOf(b).Int()
-	return (aval + bval) % 5
+	aval := int(reflect.ValueOf(a).Int())
+	bval := int(reflect.ValueOf(b).Int())
+	var res int
+	res = (aval + bval) % 5
+	return res
 }
 
 func gequals(a, b groups.Element) bool {
