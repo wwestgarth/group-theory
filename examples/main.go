@@ -31,7 +31,7 @@ func main() {
 
 	generated := groups.New(&group_op, &group_eq)
 	explicit := groups.New(&group_op, &group_eq)
-	
+
 	generated.Generate(1, 10)
 	generated.Details()
 

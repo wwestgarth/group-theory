@@ -1,6 +1,8 @@
 package groups
 
 // TODO: Fix isgenerator check
+// TODO: Confirm whether identity check is correct
+// TODO: Fix that a generator is non-unique
 // TODO: add function comments
 
 import (
@@ -14,9 +16,9 @@ type GroupOperation func(Element, Element) Element
 type GroupEquals func(Element, Element) bool
 
 type Group struct {
-	elements map[Element]bool
-	operator GroupOperation
-	equals GroupEquals
+	elements  map[Element]bool
+	operator  GroupOperation
+	equals    GroupEquals
 	generator Element
 }
 
@@ -52,35 +54,36 @@ func (g *Group) Generate(generator Element, max_order int) bool {
 	return found
 }
 
-func (g *Group) isgenerator(e Element) bool{
+func (g *Group) isidentity(e Element) bool {
+	return g.equals(e, g.Operate(e, e)) // Unsure if this is sufficient
+}
+
+func (g *Group) isgenerator(e Element) bool {
 
 	if g.generator != nil {
 		return g.equals(g.generator, e) // Already cached
 	}
 
-	if g.equals(e, g.Operate(e, e)) {
-		return false // element is the identity...or its own inverse
+	if g.isidentity(e) {
+		return false // element is the identity
 	}
 
 	var current = e
 	// Not quite right, this is either give the generator of the group
-	// Or a generator of a sub-group.
+	// Or a generator of a sub-group. A generator is also not unique
 	for i := 0; i < len(g.elements); i++ {
 		current = g.Operate(e, current)
-		if
 	}
-	
+
 	return g.equals(e, current)
 }
 
 func (g *Group) ensuregenerator() {
 
 	if g.generator != nil {
-		fmt.Println("Early")
-		fmt.Println(g.generator)
 		return
 	}
-	
+
 	for element := range g.elements {
 		if g.isgenerator(element) {
 			g.generator = element
@@ -90,16 +93,16 @@ func (g *Group) ensuregenerator() {
 
 }
 
-func (g *Group) Analyse()  {
+func (g *Group) Analyse() {
 
 	g.ensuregenerator()
 
 }
 
 func (g *Group) Details() {
-	fmt.Println("Group Details");
-	fmt.Println("Order    :", len(g.elements));
-	fmt.Println("Generator:", g.generator);
+	fmt.Println("Group Details")
+	fmt.Println("Order    :", len(g.elements))
+	fmt.Println("Generator:", g.generator)
 }
 
 func (g *Group) Operate(a, b Element) Element {
