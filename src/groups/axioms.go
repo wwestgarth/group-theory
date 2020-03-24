@@ -2,8 +2,9 @@ package groups
 
 // checkClosure checks whether the elements in the Group acted on
 // by the Group's Operator is closed 
-func (g *Group) checkClosure() bool {
+func (g *Group) checkClosure() (bool, error) {
 
+	var err GroupError
 	g.cayleytable = make(map[Element]map[Element]bool)
 
 	for element1 := range g.elements {
@@ -12,7 +13,8 @@ func (g *Group) checkClosure() bool {
 			res := g.Operate(element1, element2)
 
 			if !g.elements[res] {
-				return false
+				err.New(ErrorNotClosed)
+				return false, err
 			}
 
 			_, is_in := g.cayleytable[element1]
@@ -24,5 +26,5 @@ func (g *Group) checkClosure() bool {
 		}
 	}
 
-	return true
+	return true, err
 }

@@ -104,7 +104,8 @@ func (g *Group) ensureGenerator() {
 // of Group Theory
 func (g *Group) Analyse() {
 
-	fmt.Println("Closed:", g.checkClosure())
+	res, _ := g.checkClosure()
+	fmt.Println("Closed:", res)
 
 	g.ensureGenerator()
 
@@ -123,7 +124,7 @@ func (g *Group) Operate(a, b Element) Element {
 }
 
 // Operate returns a new instance of a Group. Requires an Groups operation
-// and a means of element equality. 
+// and a means of element equality.
 func New(op *GroupOperation, eq *GroupEquals) Group {
 	var g Group
 	g.elements = make(map[Element]bool)
