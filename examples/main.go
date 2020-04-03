@@ -3,6 +3,7 @@ package main
 import (
 	"groups"
 	"reflect"
+	"fmt"
 )
 
 func goperation(a, b groups.Element) groups.Element {
@@ -40,6 +41,9 @@ func main() {
 	explicit.Add(set)
 	explicit.Details()
 
-	explicit.Analyse()
+	err := explicit.Analyse()
 	explicit.Details()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }

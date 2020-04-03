@@ -20,6 +20,7 @@ type Group struct {
 	operator    GroupOperation
 	equals      GroupEquals
 	generator   Element
+	identity    Element
 	cayleytable map[Element]map[Element]bool
 }
 
@@ -102,13 +103,27 @@ func (g *Group) ensureGenerator() {
 
 // Analyse checks the given Group's elements and Operation satisies the axioms
 // of Group Theory
-func (g *Group) Analyse() {
+func (g *Group) Analyse() error {
 
-	res, _ := g.checkClosure()
-	fmt.Println("Closed:", res)
+	fmt.Println("Analysing...")
+	_, err := groupIsClosed(g)
+	if err != nil {
+		return err
+	}
+
+	g.identity, err = groupHasIdentity(g)
+	if err != nil {
+		return err
+	}
+
+	_, err = groupHasInverses(g)
+	if err != nil {
+		return err
+	}
 
 	g.ensureGenerator()
 
+	return nil
 }
 
 // Details prints all know details of the Group
@@ -116,6 +131,7 @@ func (g *Group) Details() {
 	fmt.Println("Group Details")
 	fmt.Println("Order    :", len(g.elements))
 	fmt.Println("Generator:", g.generator)
+	fmt.Println("Identity :", g.identity)
 }
 
 // Operate executes the Group's registered operator
