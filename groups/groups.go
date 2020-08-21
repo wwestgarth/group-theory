@@ -9,12 +9,17 @@ import (
 	"fmt"
 )
 
+// Element An abstracted group element
 type Element interface {
 }
 
+// GroupOperation An abtracted group operation defined on two group elements
 type GroupOperation func(Element, Element) Element
+
+// GroupEquals An abstracted equality functions defined on two group elements
 type GroupEquals func(Element, Element) bool
 
+// Group Structure which defines a Group
 type Group struct {
 	elements    map[Element]bool
 	operator    GroupOperation
@@ -35,13 +40,13 @@ func (g *Group) Add(elements []Element) {
 // Generate Attempts to generates a group from the given generator. If more
 // than 'max_order' elements are added to the Group then we group generate
 // is stopped.
-func (g *Group) Generate(generator Element, max_order int) bool {
+func (g *Group) Generate(generator Element, maxOrder int) bool {
 
 	found := false
 	var current = generator
 	var elements []Element
 
-	for i := 0; i < max_order; i++ {
+	for i := 0; i < maxOrder; i++ {
 
 		elements = append(elements, current)
 		current = g.Operate(generator, current)
@@ -139,7 +144,7 @@ func (g *Group) Operate(a, b Element) Element {
 	return g.operator(a, b)
 }
 
-// Operate returns a new instance of a Group. Requires an Groups operation
+// New returns a new instance of a Group. Requires an Groups operation
 // and a means of element equality.
 func New(op *GroupOperation, eq *GroupEquals) Group {
 	var g Group

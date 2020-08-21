@@ -17,8 +17,8 @@ func groupIsClosed(g *Group) (bool, error) {
 				return false, err
 			}
 
-			_, is_in := g.cayleytable[element1]
-			if !is_in {
+			_, isIn := g.cayleytable[element1]
+			if !isIn {
 				g.cayleytable[element1] = make(map[Element]bool)
 			}
 
