@@ -1,9 +1,5 @@
 package groups
 
-import (
-	"fmt"
-)
-
 const (
 	ErrorOpFailed   = "Group Operation failed"
 	ErrorNotClosed  = "Group is not closed"

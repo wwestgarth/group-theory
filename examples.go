@@ -1,9 +1,9 @@
 package main
 
 import (
-	"groups"
-	"reflect"
 	"fmt"
+	"group-theory/groups"
+	"reflect"
 )
 
 func goperation(a, b groups.Element) groups.Element {
