@@ -34,25 +34,28 @@ func createZnGroup(modulus int) Group {
 	return g
 }
 
-func TestZ5GroupGiven(t *testing.T) {
+func TestZ4GroupGiven(t *testing.T) {
 
-	var g = createZnGroup(5)
-	var set = []Element{0, 1, 2, 3, 4}
+	var g = createZnGroup(4)
+	var set = []Element{0, 1, 2, 3}
 
 	g.Add(set)
 
 	g.Analyse()
+	g.FindGenerators()
+
 	if !g.equals(g.identity, 0) {
 		t.Errorf("Z5 identity = %d; want 0", g.identity)
 	}
 
-	if !g.equals(g.generator, 1) {
-		t.Errorf("Z5 generator = %d; want 1", g.generator)
+	if len(g.generators) != 2 {
+		t.Errorf("Expected onlt 2 group generator, found %d", len(g.generators))
 	}
 
-	if len(g.elements) != 5 {
+	if len(g.elements) != 4 {
 		t.Errorf("Z5 Order = %d; want 5", len(g.elements))
 	}
+
 }
 
 func TestZ5GroupGenerated(t *testing.T) {
@@ -69,8 +72,8 @@ func TestZ5GroupGenerated(t *testing.T) {
 		t.Errorf("Z5 identity = %d; want 0", g.identity)
 	}
 
-	if !g.equals(g.generator, 1) {
-		t.Errorf("Z5 generator = %d; want 1", g.generator)
+	if len(g.generators) != 1 {
+		t.Errorf("Could not find generators for group")
 	}
 
 	if len(g.elements) != 5 {

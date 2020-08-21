@@ -1,9 +1,6 @@
 package groups
 
-// TODO: Fix isgenerator check
-// TODO: Confirm whether identity check is correct
-// TODO: Fix that a generator is non-unique
-// Error handle, with proper error return types
+// TODO: Confirm whether identity check is correct, and use it
 
 import (
 	"fmt"
@@ -24,7 +21,7 @@ type Group struct {
 	elements    map[Element]bool
 	operator    GroupOperation
 	equals      GroupEquals
-	generator   Element
+	generators  []Element
 	identity    Element
 	cayleytable map[Element]map[Element]bool
 }
@@ -58,7 +55,7 @@ func (g *Group) Generate(generator Element, maxOrder int) bool {
 	}
 
 	if found {
-		g.generator = generator
+		g.generators = append(g.generators, generator)
 		g.Add(elements)
 	}
 
@@ -73,35 +70,31 @@ func (g *Group) isIdentity(e Element) bool {
 // isGenerator returns true if the given Element is a geneartor of the Group
 func (g *Group) isGenerator(e Element) bool {
 
-	if g.generator != nil {
-		return g.equals(g.generator, e) // Already cached
-	}
-
 	if g.isIdentity(e) {
 		return false // element is the identity
 	}
 
 	var current = e
-	// Not quite right, this is either give the generator of the group
-	// Or a generator of a sub-group. A generator is also not unique
-	for i := 0; i < len(g.elements); i++ {
+
+	for i := 0; i < len(g.elements)-1; i++ {
 		current = g.Operate(e, current)
+
+		// If we get back to ourselves too soon, its subgroup
+		if g.equals(e, current) {
+			return false
+		}
 	}
 
+	current = g.Operate(e, current)
 	return g.equals(e, current)
 }
 
-// ensureGenerator ensures the Group's generator field is known
-func (g *Group) ensureGenerator() {
-
-	if g.generator != nil {
-		return
-	}
+// FindGenerators find generators in the group
+func (g *Group) FindGenerators() {
 
 	for element := range g.elements {
 		if g.isGenerator(element) {
-			g.generator = element
-			return
+			g.generators = append(g.generators, element)
 		}
 	}
 }
@@ -125,17 +118,15 @@ func (g *Group) Analyse() error {
 		return err
 	}
 
-	g.ensureGenerator()
-
 	return nil
 }
 
 // Details prints all know details of the Group
 func (g *Group) Details() {
 	fmt.Println("Group Details")
-	fmt.Println("Order    :", len(g.elements))
-	fmt.Println("Generator:", g.generator)
-	fmt.Println("Identity :", g.identity)
+	fmt.Println("Order     :", len(g.elements))
+	fmt.Println("Generators:", g.generators)
+	fmt.Println("Identity  :", g.identity)
 }
 
 // Operate executes the Group's registered operator
