@@ -23,7 +23,7 @@ func gZequals(a, b Element) bool {
 	return aval == bval
 }
 
-func createTestGroup(modulus int) Group {
+func createZnGroup(modulus int) Group {
 	var groupEq GroupEquals
 	groupEq = gZequals
 
@@ -36,7 +36,7 @@ func createTestGroup(modulus int) Group {
 
 func TestZ5GroupGiven(t *testing.T) {
 
-	var g = createTestGroup(5)
+	var g = createZnGroup(5)
 	var set = []Element{0, 1, 2, 3, 4}
 
 	g.Add(set)
@@ -57,7 +57,7 @@ func TestZ5GroupGiven(t *testing.T) {
 
 func TestZ5GroupGenerated(t *testing.T) {
 
-	var g = createTestGroup(5)
+	var g = createZnGroup(5)
 
 	if !g.Generate(1, 6) {
 		t.Errorf("Z5 could not generate group from %d", 1)
@@ -80,8 +80,49 @@ func TestZ5GroupGenerated(t *testing.T) {
 
 func TestZLargeGroupGenerated(t *testing.T) {
 
-	var g = createTestGroup(1000)
+	var g = createZnGroup(1000)
 	if g.Generate(1, 6) {
 		t.Errorf("Somehow managed to generate a group bigger that maxOrder")
+	}
+}
+
+func TestGroupNotClosed(t *testing.T) {
+
+	var g = createZnGroup(5)
+	var set = []Element{1, 2, 3, 4, 5}
+	g.Add(set)
+
+	var err = g.Analyse()
+
+	if err == nil {
+		t.Errorf("Expected to be unable to find identity")
+	}
+	if err.Error() != ErrorNotClosed {
+		t.Errorf("Wrong error code expected: %s got %s", ErrorNotClosed, err.Error())
+	}
+}
+
+func noIdentityOp(a, b Element) Element {
+	aval := int(reflect.ValueOf(a).Int())
+	return aval + 1
+}
+func TestNoIdentity(t *testing.T) {
+
+	var groupEq GroupEquals
+	groupEq = gZequals
+
+	var groupOp GroupOperation
+	groupOp = noIdentityOp
+	g := New(&groupOp, &groupEq)
+
+	var set = []Element{1, 2, 3, 4, 5}
+	g.Add(set)
+
+	var err = g.Analyse()
+
+	if err == nil {
+		t.Errorf("Found identity unexpectedly: %d", g.identity)
+	} else if err.Error() != ErrorNotClosed {
+		t.Errorf("Wrong error code expected: %s got %s", ErrorNotClosed, err.Error())
 	}
 }
