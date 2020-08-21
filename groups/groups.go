@@ -110,7 +110,6 @@ func (g *Group) ensureGenerator() {
 // of Group Theory
 func (g *Group) Analyse() error {
 
-	fmt.Println("Analysing...")
 	_, err := groupIsClosed(g)
 	if err != nil {
 		return err
