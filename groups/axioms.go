@@ -29,20 +29,25 @@ func groupIsClosed(g *Group) (bool, error) {
 	return true, nil
 }
 
+// isIdentity returns true if the given Element is the Group's Identity
+// The identity of a group is unique, and has order 1. If the below holds
+// true then order of e is either 1, or infinity. Given the order of an element
+// must divide the group order, for finite groups the order cannot be infinity
+// and so it must be 1, and thus the identity element.
+func (g *Group) isIdentity(e Element) bool {
+	return g.equals(e, g.Operate(e, e))
+}
+
 // groupHasIdentity Checks and returns the identity element of the suspected group
 func groupHasIdentity(g *Group) (Element, error) {
 
 	var err GroupError
 	var identity Element
 
-	for element1 := range g.elements {
-		for element2 := range g.elements {
-
-			res := g.Operate(element1, element2)
-
-			if g.equals(element2, res) {
-				identity = element1
-			}
+	for element := range g.elements {
+		if g.isIdentity(element) {
+			identity = element
+			break
 		}
 	}
 

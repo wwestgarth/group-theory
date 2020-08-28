@@ -1,7 +1,5 @@
 package groups
 
-// TODO: Confirm whether identity check is correct, and use it
-
 import (
 	"fmt"
 )
@@ -60,11 +58,6 @@ func (g *Group) Generate(generator Element, maxOrder int) bool {
 	}
 
 	return found
-}
-
-// isIdentity returns true if the given Element is the Group's Identity
-func (g *Group) isIdentity(e Element) bool {
-	return g.equals(e, g.Operate(e, e)) // Unsure if this is sufficient
 }
 
 // isGenerator returns true if the given Element is a geneartor of the Group
