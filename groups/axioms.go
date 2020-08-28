@@ -5,7 +5,6 @@ package groups
 func groupIsClosed(g *Group) (bool, error) {
 
 	var err GroupError
-	g.cayleytable = make(map[Element]map[Element]bool)
 
 	for element1 := range g.elements {
 		for element2 := range g.elements {
@@ -19,10 +18,10 @@ func groupIsClosed(g *Group) (bool, error) {
 
 			_, isIn := g.cayleytable[element1]
 			if !isIn {
-				g.cayleytable[element1] = make(map[Element]bool)
+				g.cayleytable[element1] = make(map[Element]Element)
 			}
 
-			g.cayleytable[element1][element2] = true
+			g.cayleytable[element1][element2] = res
 		}
 	}
 

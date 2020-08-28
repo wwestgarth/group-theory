@@ -21,7 +21,7 @@ type Group struct {
 	equals      GroupEquals
 	generators  []Element
 	identity    Element
-	cayleytable map[Element]map[Element]bool
+	cayleytable map[Element]map[Element]Element
 }
 
 // Add adds the given slice to the Group. These are the members of the Group.
@@ -127,8 +127,20 @@ func (g *Group) Details() {
 	fmt.Println("Identity  :", g.identity)
 }
 
-// Operate executes the Group's registered operator
+// Operate executes the Group's registered operator, using the Cayley Table
+// to look up values if the operation has been performed before
 func (g *Group) Operate(a, b Element) Element {
+
+	_, isIn := g.cayleytable[a]
+	if !isIn {
+		return g.operator(a, b)
+	}
+
+	value, isIn := g.cayleytable[a][b]
+	if isIn {
+		return value
+	}
+
 	return g.operator(a, b)
 }
 
@@ -139,5 +151,6 @@ func New(op *GroupOperation, eq *GroupEquals) Group {
 	g.elements = make(map[Element]bool)
 	g.operator = *op
 	g.equals = *eq
+	g.cayleytable = make(map[Element]map[Element]Element)
 	return g
 }
