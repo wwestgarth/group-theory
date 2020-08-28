@@ -46,25 +46,22 @@ func groupHasIdentity(g *Group) (Element, error) {
 	for element := range g.elements {
 		if g.isIdentity(element) {
 			identity = element
-			break
+			return identity, nil
 		}
 	}
 
-	if identity == nil {
-		err.New(ErrorNoIdentity, nil, nil)
-		return nil, err
-	}
-	return identity, nil
+	err.New(ErrorNoIdentity, nil, nil)
+	return nil, err
 }
 
 // findInverseElement Given and Element finds its inverse in the Group
 func findInverseElement(g *Group, e Element) (Element, error) {
 
 	var err GroupError
-	var inverse Element
 
 	if g.identity == nil {
 		err.New(ErrorNoIdentity, nil, nil)
+		return nil, err
 	}
 
 	if g.equals(g.identity, e) {
@@ -76,20 +73,15 @@ func findInverseElement(g *Group, e Element) (Element, error) {
 		res := g.Operate(e, element1)
 
 		if g.equals(res, g.identity) {
-			inverse = element1
-			break
+			return element1, nil
 		}
 	}
 
-	if inverse == nil {
-		err.New(ErrorNoInverse, e, nil)
-		return nil, err
-	}
-
-	return inverse, nil
+	err.New(ErrorNoInverse, e, nil)
+	return nil, err
 }
 
-// groupHasInverses Returns true if ever element in thr group has an inverse
+// groupHasInverses Returns true if every element in thr group has an inverse
 func groupHasInverses(g *Group) (bool, error) {
 
 	var err GroupError
