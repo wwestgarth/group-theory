@@ -99,6 +99,11 @@ func (g *Group) FindGenerators() {
 	}
 }
 
+// HasSubgroups return whether the group has subgroups based on the primatlity of the group order
+func (g *Group) HasSubgroups() bool {
+	return !ProbablyPrime(len(g.elements), 10)
+}
+
 // Analyse checks the given Group's elements and Operation satisies the axioms
 // of Group Theory
 func (g *Group) Analyse() error {

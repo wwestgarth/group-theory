@@ -5,6 +5,8 @@ import (
 	"math/rand"
 )
 
+var smallPrimes = map[int]bool{2: true, 3: true, 5: true, 7: true, 11: true}
+
 // fermatsProbablyPrimeTest a crude probably prime test for n. For a randomly chosen a < n ,
 // if a^(n-1) != 1 (mod n)  => n is composite
 func fermatsProbablyPrimeTest(n int) bool {
@@ -33,6 +35,10 @@ func ProbablyPrime(n, samples int) bool {
 
 	if n%2 == 0 {
 		return false
+	}
+
+	if smallPrimes[n] {
+		return true
 	}
 
 	for i := 0; i < samples; i++ {

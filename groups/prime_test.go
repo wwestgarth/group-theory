@@ -15,7 +15,7 @@ func TestIsntPrime(t *testing.T) {
 
 func TestIsPrime(t *testing.T) {
 
-	testValues := []int{11, 23, 313, 2017, 7901}
+	testValues := []int{5, 11, 23, 313, 2017, 7901}
 	for _, testValue := range testValues {
 		if !ProbablyPrime(testValue, 10) {
 			t.Errorf("Expected %d to be prime", testValue)

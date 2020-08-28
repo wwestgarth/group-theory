@@ -56,11 +56,16 @@ func TestZ4GroupGiven(t *testing.T) {
 		t.Errorf("Z5 Order = %d; want 5", len(g.elements))
 	}
 
+	if !g.HasSubgroups() {
+		t.Errorf("Z4 should have subgroups")
+	}
+
 }
 
 func TestZ5GroupGenerated(t *testing.T) {
 
-	var g = createZnGroup(5)
+	order := 5
+	var g = createZnGroup(order)
 
 	if !g.Generate(1, 6) {
 		t.Errorf("Z5 could not generate group from %d", 1)
@@ -76,8 +81,36 @@ func TestZ5GroupGenerated(t *testing.T) {
 		t.Errorf("Could not find generators for group")
 	}
 
-	if len(g.elements) != 5 {
+	if len(g.elements) != order {
 		t.Errorf("Z5 Order = %d; want 5", len(g.elements))
+	}
+
+	if g.HasSubgroups() {
+		t.Errorf("Z5 should not have subgroups")
+	}
+}
+
+func TestZ313GroupGenerated(t *testing.T) {
+
+	order := 313
+	var g = createZnGroup(order)
+
+	if !g.Generate(1, 315) {
+		t.Errorf("Z313 could not generate group from %d", 1)
+	}
+
+	g.Analyse()
+
+	if !g.equals(g.identity, 0) {
+		t.Errorf("Z313 identity = %d; want 0", g.identity)
+	}
+
+	if len(g.elements) != order {
+		t.Errorf("Z313 Order = %d; want 313", len(g.elements))
+	}
+
+	if g.HasSubgroups() {
+		t.Errorf("Z313 should not have subgroups")
 	}
 }
 
