@@ -7,11 +7,19 @@ import (
 
 var smallPrimes = map[int]bool{2: true, 3: true, 5: true, 7: true, 11: true}
 
+func randRangeInt(min, max int) int {
+	// Move interval to [0, n)
+	if max <= min {
+		panic(fmt.Sprintf("[%d %d) is not a valid in-zer0 interval", min, max))
+	}
+	return rand.Intn(max-min) + min
+}
+
 // fermatsProbablyPrimeTest a crude probably prime test for n. For a randomly chosen a < n ,
 // if a^(n-1) != 1 (mod n)  => n is composite
 func fermatsProbablyPrimeTest(n int) bool {
 
-	a := rand.Intn(n)
+	a := randRangeInt(1, n)
 	res := a
 	for i := 2; i < n; i++ {
 		res = (res * a) % n
