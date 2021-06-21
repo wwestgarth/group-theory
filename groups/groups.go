@@ -18,34 +18,25 @@ type GroupEquals func(Element, Element) bool
 
 // Group Structure which defines a Group
 type Group struct {
-	elements    map[Element]bool
-	operator    GroupOperation
-	equals      GroupEquals
-	generators  []Element
-	identity    Element
-	cayleytable map[Element]map[Element]Element
-}
-
-// Add adds the given slice to the Group. These are the members of the Group.
-func (g *Group) Add(elements []Element) {
-
-	for _, element := range elements {
-		g.elements[element] = true
-	}
+	elements   map[Element]bool
+	operator   GroupOperation
+	equals     GroupEquals
+	generators []Element
+	identity   Element
+	table      *cayleyTable
 }
 
 // Generate Attempts to generates a group from the given generator. If more
 // than 'max_order' elements are added to the Group then we group generate
 // is stopped.
-func (g *Group) Generate(generator Element, maxOrder int) bool {
+func (g *Group) Generate(generator Element, maxOrder uint32) (err error) {
+
+	var current = generator
 
 	found := false
-	var current = generator
-	var elements []Element
+	for i := uint32(0); i < maxOrder; i++ {
 
-	for i := 0; i < maxOrder; i++ {
-
-		elements = append(elements, current)
+		g.elements[current] = true
 		current = g.Operate(generator, current)
 
 		if g.equals(generator, current) {
@@ -54,12 +45,13 @@ func (g *Group) Generate(generator Element, maxOrder int) bool {
 		}
 	}
 
-	if found {
-		g.generators = append(g.generators, generator)
-		g.Add(elements)
+	if !found {
+		err = ErrNotClosed
+		return
 	}
 
-	return found
+	g.generators = append(g.generators, generator)
+	return
 }
 
 // isGenerator returns true if the given Element is a geneartor of the Group
@@ -109,9 +101,10 @@ func (g *Group) Analyse() (err error) {
 
 	var identity Element
 	if identity, err = groupHasIdentity(g); err != nil {
-		g.identity = identity
+
 		return
 	}
+	g.identity = identity
 
 	var ok bool
 	if ok, err = groupHasInverses(g); err != nil || !ok {
@@ -131,18 +124,14 @@ func (g *Group) Details() {
 
 // Operate executes the Group's registered operator, using the Cayley Table
 // to look up values if the operation has been performed before
-func (g *Group) Operate(a, b Element) Element {
+func (g *Group) Operate(a, b Element) (value Element) {
 
-	if _, ok := g.cayleytable[a]; !ok {
-		return g.operator(a, b)
+	value, err := g.table.lookup(a, b)
+	if err != nil {
+		value = g.operator(a, b)
 	}
 
-	if value, ok := g.cayleytable[a][b]; ok {
-		return value
-	}
-
-	// operation not cached, calculate it
-	return g.operator(a, b)
+	return
 }
 
 // New returns a new instance of a Group. Requires an Groups operation
@@ -152,6 +141,33 @@ func New(op *GroupOperation, eq *GroupEquals) Group {
 	g.elements = make(map[Element]bool)
 	g.operator = *op
 	g.equals = *eq
-	g.cayleytable = make(map[Element]map[Element]Element)
+	g.table = newCayleyTable()
 	return g
+}
+
+// New returns a new instance of a Group. Requires an Groups operation
+// and a means of element equality.
+func NewGroup(op *GroupOperation, eq *GroupEquals, elements []Element) (g Group) {
+
+	g.operator = *op
+	g.equals = *eq
+
+	g.elements = make(map[Element]bool)
+	g.table = newCayleyTable()
+
+	// Fill in elements
+	for _, element := range elements {
+		g.elements[element] = true
+	}
+
+	return g
+}
+
+// New returns a new instance of a Group. Requires an Groups operation
+// and a means of element equality.
+func NewGroupFromGenerator(op *GroupOperation, eq *GroupEquals, generator Element, maxOrder uint32) (g Group) {
+	g = New(op, eq)
+	g.Generate(generator, maxOrder)
+
+	return
 }

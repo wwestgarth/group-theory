@@ -14,14 +14,11 @@ func groupIsClosed(g *Group) (closed bool) {
 				return
 			}
 
-			if _, ok := g.cayleytable[element1]; !ok {
-				g.cayleytable[element1] = make(map[Element]Element)
-			}
-
-			g.cayleytable[element1][element2] = res
+			g.table.add(element1, element2, res)
 		}
 	}
 
+	closed = true
 	return
 }
 
