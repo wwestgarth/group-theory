@@ -2,30 +2,51 @@ package main
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/wwestgarth/group-theory/groups"
 )
 
 func goperation(a, b groups.Element) groups.Element {
 
-	aval := int(reflect.ValueOf(a).Int())
-	bval := int(reflect.ValueOf(b).Int())
-	var res int
-	res = (aval + bval) % 5
-	return res
+	aValue, ok := a.(int)
+	if !ok {
+		// Need to handle this
+		return false
+	}
+
+	bValue, ok := b.(int)
+	if !ok {
+		// Need to handle this
+		return false
+	}
+
+	return (aValue + bValue) % 6
 }
 
 func gequals(a, b groups.Element) bool {
 
-	aval := reflect.ValueOf(a).Int()
-	bval := reflect.ValueOf(b).Int()
-	return aval == bval
+	aValue, ok := a.(int)
+	if !ok {
+		// Need to handle this
+		return false
+	}
+
+	bValue, ok := b.(int)
+	if !ok {
+		// Need to handle this
+		return false
+	}
+
+	return aValue == bValue
+}
+
+func detailsGeneratedGroup() {
+	return
 }
 
 func main() {
 
-	var set = []groups.Element{0, 1, 2, 3, 4}
+	var set = []groups.Element{0, 1, 2, 3, 4, 5}
 
 	var group_eq groups.GroupEquals
 	group_eq = gequals
@@ -34,13 +55,13 @@ func main() {
 	group_op = goperation
 
 	generated := groups.NewGroupFromGenerator(&group_op, &group_eq, 1, 10)
-	generated.Analyse()
+	generated.Validate()
 	generated.Details()
 
 	explicit := groups.NewGroup(&group_op, &group_eq, set)
 	explicit.Details()
 
-	err := explicit.Analyse()
+	_, err := explicit.Validate()
 	explicit.Details()
 	if err != nil {
 		fmt.Println(err.Error())

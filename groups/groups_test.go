@@ -43,7 +43,7 @@ func TestZ4GroupGiven(t *testing.T) {
 	g.elements[2] = true
 	g.elements[3] = true
 
-	err := g.Analyse()
+	err := g.Validate()
 	if err != nil {
 		t.Errorf("failed: %s", err)
 	}
@@ -76,7 +76,7 @@ func TestZ5GroupGenerated(t *testing.T) {
 		t.Errorf("Z5 could not generate group from %d", 1)
 	}
 
-	g.Analyse()
+	g.Validate()
 
 	if !g.equals(g.identity, 0) {
 		t.Errorf("Z5 identity = %d; want 0", g.identity)
@@ -104,7 +104,7 @@ func TestZ313GroupGenerated(t *testing.T) {
 		t.Errorf("Z313 could not generate group from %d", 1)
 	}
 
-	g.Analyse()
+	g.Validate()
 
 	if !g.equals(g.identity, 0) {
 		t.Errorf("Z313 identity = %d; want 0", g.identity)
@@ -137,7 +137,7 @@ func TestGroupNotClosed(t *testing.T) {
 	g.elements[4] = true
 	g.elements[5] = true
 
-	var err = g.Analyse()
+	var err = g.Validate()
 
 	if err == nil {
 		t.Errorf("Expected to be unable to find identity")
@@ -166,7 +166,7 @@ func TestNoIdentity(t *testing.T) {
 	g.elements[4] = true
 	g.elements[5] = true
 
-	var err = g.Analyse()
+	var err = g.Validate()
 
 	if err == nil {
 		t.Errorf("Found identity unexpectedly: %d", g.identity)

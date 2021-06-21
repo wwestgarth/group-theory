@@ -2,15 +2,15 @@ package groups
 
 // groupIsClosed checks whether the elements in the Group acted on
 // by the Group's Operator is closed
-func groupIsClosed(g *Group) (closed bool) {
+func (g *Group) isClosed() (err error) {
 
+	err = ErrNotClosed
 	for element1 := range g.elements {
 		for element2 := range g.elements {
 
 			res := g.Operate(element1, element2)
 
 			if !g.elements[res] {
-				closed = false
 				return
 			}
 
@@ -18,7 +18,7 @@ func groupIsClosed(g *Group) (closed bool) {
 		}
 	}
 
-	closed = true
+	err = nil
 	return
 }
 
@@ -32,23 +32,30 @@ func (g *Group) isIdentity(e Element) bool {
 }
 
 // groupHasIdentity Checks and returns the identity element of the suspected group
-func groupHasIdentity(g *Group) (identity Element, err error) {
+func (g *Group) findIdentity() (identity Element, err error) {
+
+	if g.identity != nil {
+		identity = g.identity
+		return
+	}
 
 	for element := range g.elements {
+
 		if g.isIdentity(element) {
 			identity = element
+			g.identity = identity
 			return
 		}
 	}
 
-	return nil, ErrNoIdentity
+	err = ErrNoIdentity
+	return
 }
 
 // findInverseElement Given and Element finds its inverse in the Group
 func findInverseElement(g *Group, e Element) (inverse Element, err error) {
 
-	if g.identity == nil {
-		err = ErrNoIdentity
+	if _, err = g.findIdentity(); err != nil {
 		return
 	}
 
@@ -73,10 +80,9 @@ func findInverseElement(g *Group, e Element) (inverse Element, err error) {
 }
 
 // groupHasInverses Returns true if every element in thr group has an inverse
-func groupHasInverses(g *Group) (res bool, err error) {
+func (g *Group) hasInverses() (err error) {
 
-	if g.identity == nil {
-		err = ErrNoIdentity
+	if _, err = g.findIdentity(); err != nil {
 		return
 	}
 
@@ -87,6 +93,5 @@ func groupHasInverses(g *Group) (res bool, err error) {
 		}
 	}
 
-	res = true
 	return
 }

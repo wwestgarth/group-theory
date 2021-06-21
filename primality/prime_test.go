@@ -2,37 +2,24 @@ package primality
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestIsntPrime(t *testing.T) {
+func TestProbablyPrimeComposite(t *testing.T) {
 
-	testValues := []int{9, 15, 27, 6319}
+	testValues := []int{9, 15, 27, 6319, 4, 6, 122, 1024}
+
 	for _, testValue := range testValues {
-		if ProbablyPrime(testValue, 10) {
-			t.Errorf("Expected %d to be composite", testValue)
-		}
+		assert.False(t, ProbablyPrime(testValue, 10))
 	}
-
 }
 
-func TestIsPrime(t *testing.T) {
+func TestProbablyPrime(t *testing.T) {
 
 	testValues := []int{5, 11, 23, 313, 2017, 7901}
-	for _, testValue := range testValues {
-		if !ProbablyPrime(testValue, 10) {
-			t.Errorf("Expected %d to be prime", testValue)
-		}
-	}
-}
-
-func TestEvens(t *testing.T) {
-
-	testValues := []int{4, 6, 122, 1024}
 
 	for _, testValue := range testValues {
-		if ProbablyPrime(testValue, 10) {
-			t.Errorf("Expected %d to be composite", testValue)
-		}
+		assert.True(t, ProbablyPrime(testValue, 10))
 	}
-
 }
