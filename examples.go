@@ -33,13 +33,11 @@ func main() {
 	var group_op groups.GroupOperation
 	group_op = goperation
 
-	generated := groups.New(&group_op, &group_eq)
-	explicit := groups.New(&group_op, &group_eq)
-
-	generated.Generate(1, 10)
+	generated := groups.NewGroupFromGenerator(&group_op, &group_eq, 1, 10)
+	generated.Analyse()
 	generated.Details()
 
-	explicit.Add(set)
+	explicit := groups.NewGroup(&group_op, &group_eq, set)
 	explicit.Details()
 
 	err := explicit.Analyse()

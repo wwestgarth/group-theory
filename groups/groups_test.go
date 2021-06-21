@@ -37,11 +37,16 @@ func createZnGroup(modulus int) Group {
 func TestZ4GroupGiven(t *testing.T) {
 
 	var g = createZnGroup(4)
-	var set = []Element{0, 1, 2, 3}
 
-	g.Add(set)
+	g.elements[0] = true
+	g.elements[1] = true
+	g.elements[2] = true
+	g.elements[3] = true
 
-	g.Analyse()
+	err := g.Analyse()
+	if err != nil {
+		t.Errorf("failed: %s", err)
+	}
 	g.FindGenerators()
 
 	if !g.equals(g.identity, 0) {
@@ -67,7 +72,7 @@ func TestZ5GroupGenerated(t *testing.T) {
 	order := 5
 	var g = createZnGroup(order)
 
-	if !g.Generate(1, 6) {
+	if err := g.Generate(1, 6); err != nil {
 		t.Errorf("Z5 could not generate group from %d", 1)
 	}
 
@@ -95,7 +100,7 @@ func TestZ313GroupGenerated(t *testing.T) {
 	order := 313
 	var g = createZnGroup(order)
 
-	if !g.Generate(1, 315) {
+	if err := g.Generate(1, 315); err != nil {
 		t.Errorf("Z313 could not generate group from %d", 1)
 	}
 
@@ -117,7 +122,7 @@ func TestZ313GroupGenerated(t *testing.T) {
 func TestZLargeGroupGenerated(t *testing.T) {
 
 	var g = createZnGroup(1000)
-	if g.Generate(1, 6) {
+	if err := g.Generate(1, 6); err != ErrNotClosed {
 		t.Errorf("Somehow managed to generate a group bigger that maxOrder")
 	}
 }
@@ -125,16 +130,20 @@ func TestZLargeGroupGenerated(t *testing.T) {
 func TestGroupNotClosed(t *testing.T) {
 
 	var g = createZnGroup(5)
-	var set = []Element{1, 2, 3, 4, 5}
-	g.Add(set)
+
+	g.elements[1] = true
+	g.elements[2] = true
+	g.elements[3] = true
+	g.elements[4] = true
+	g.elements[5] = true
 
 	var err = g.Analyse()
 
 	if err == nil {
 		t.Errorf("Expected to be unable to find identity")
 	}
-	if err.Error() != ErrorNotClosed {
-		t.Errorf("Wrong error code expected: %s got %s", ErrorNotClosed, err.Error())
+	if err != ErrNotClosed {
+		t.Errorf("Wrong error code expected: %s got %s", ErrNotClosed, err)
 	}
 }
 
@@ -151,14 +160,17 @@ func TestNoIdentity(t *testing.T) {
 	groupOp = noIdentityOp
 	g := New(&groupOp, &groupEq)
 
-	var set = []Element{1, 2, 3, 4, 5}
-	g.Add(set)
+	g.elements[1] = true
+	g.elements[2] = true
+	g.elements[3] = true
+	g.elements[4] = true
+	g.elements[5] = true
 
 	var err = g.Analyse()
 
 	if err == nil {
 		t.Errorf("Found identity unexpectedly: %d", g.identity)
-	} else if err.Error() != ErrorNotClosed {
-		t.Errorf("Wrong error code expected: %s got %s", ErrorNotClosed, err.Error())
+	} else if err != ErrNotClosed {
+		t.Errorf("Wrong error code expected: %s got %s", ErrNotClosed, err)
 	}
 }
