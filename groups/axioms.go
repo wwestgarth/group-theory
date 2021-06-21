@@ -20,7 +20,6 @@ func groupIsClosed(g *Group) (bool, error) {
 			if !isIn {
 				g.cayleytable[element1] = make(map[Element]Element)
 			}
-
 			g.cayleytable[element1][element2] = res
 		}
 	}
