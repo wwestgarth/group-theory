@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"group-theory/groups"
 	"reflect"
+
+	"github.com/wwestgarth/group-theory/groups"
 )
 
 func goperation(a, b groups.Element) groups.Element {

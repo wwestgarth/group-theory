@@ -1,6 +1,8 @@
-package groups
+package primality
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIsntPrime(t *testing.T) {
 

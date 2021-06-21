@@ -1,4 +1,4 @@
-package groups
+package primality
 
 import (
 	"fmt"
@@ -49,15 +49,9 @@ func ProbablyPrime(n, samples int) bool {
 		return true
 	}
 
-	// Check each sample in a goroutine
-	primalityResults := make(chan bool, samples)
-	for i := 0; i < samples; i++ {
-		go func(nn int) { primalityResults <- fermatsProbablyPrimeTest(nn) }(n)
-	}
-
 	// read results from channel
 	for i := 0; i < samples; i++ {
-		if !<-primalityResults {
+		if !fermatsProbablyPrimeTest(n) {
 			return false
 		}
 	}
