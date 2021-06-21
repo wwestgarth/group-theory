@@ -6,64 +6,47 @@ import (
 	"github.com/wwestgarth/group-theory/groups"
 )
 
-func goperation(a, b groups.Element) groups.Element {
+func printResults(name string, result *groups.GroupValidateResult) {
 
-	aValue, ok := a.(int)
-	if !ok {
-		// Need to handle this
-		return false
-	}
+	fmt.Println("Group name:    ", name)
+	fmt.Println("Order:         ", result.Order)
+	fmt.Println("Identity:      ", result.Identity)
+	fmt.Println("Has subgroups: ", result.HasSubgroups)
+	fmt.Println("Generators:    ", result.Generators)
+	fmt.Println()
 
-	bValue, ok := b.(int)
-	if !ok {
-		// Need to handle this
-		return false
-	}
-
-	return (aValue + bValue) % 6
 }
 
-func gequals(a, b groups.Element) bool {
+func generatedZNGroup(zN int) {
 
-	aValue, ok := a.(int)
-	if !ok {
-		// Need to handle this
-		return false
+	// Make our group operations
+	gOp := groups.GroupOperation(
+		func(a, b groups.Element) groups.Element {
+			bValue, _ := b.(int) // proper handle if type assertion fails
+			aValue, _ := a.(int)
+			return (aValue + bValue) % zN
+		})
+
+	gEq := groups.GroupEquals(
+		func(a, b groups.Element) bool {
+			aValue, aOk := a.(int)
+			bValue, bOk := b.(int)
+			return aOk && bOk && aValue == bValue
+		})
+
+	generated := groups.NewGroupFromGenerator(&gOp, &gEq, 1, 10)
+	result, err := generated.Validate()
+	if err != nil {
+		return
 	}
 
-	bValue, ok := b.(int)
-	if !ok {
-		// Need to handle this
-		return false
-	}
-
-	return aValue == bValue
-}
-
-func detailsGeneratedGroup() {
+	printResults(fmt.Sprintf("Z%d", zN), result)
 	return
 }
 
 func main() {
 
-	var set = []groups.Element{0, 1, 2, 3, 4, 5}
+	generatedZNGroup(6)
+	generatedZNGroup(5)
 
-	var group_eq groups.GroupEquals
-	group_eq = gequals
-
-	var group_op groups.GroupOperation
-	group_op = goperation
-
-	generated := groups.NewGroupFromGenerator(&group_op, &group_eq, 1, 10)
-	generated.Validate()
-	generated.Details()
-
-	explicit := groups.NewGroup(&group_op, &group_eq, set)
-	explicit.Details()
-
-	_, err := explicit.Validate()
-	explicit.Details()
-	if err != nil {
-		fmt.Println(err.Error())
-	}
 }
