@@ -2,6 +2,8 @@ package groups
 
 import (
 	"fmt"
+
+	"github.com/wwestgarth/group-theory/primality"
 )
 
 // Element An abstracted group element
@@ -94,29 +96,29 @@ func (g *Group) FindGenerators() {
 
 // HasSubgroups return whether the group has subgroups based on the primatlity of the group order
 func (g *Group) HasSubgroups() bool {
-	return !ProbablyPrime(len(g.elements), 10)
+	return !primality.ProbablyPrime(len(g.elements), 10)
 }
 
 // Analyse checks the given Group's elements and Operation satisies the axioms
 // of Group Theory
-func (g *Group) Analyse() error {
+func (g *Group) Analyse() (err error) {
 
-	_, err := groupIsClosed(g)
-	if err != nil {
-		return err
+	if !groupIsClosed(g) {
+		return ErrNotClosed
 	}
 
-	g.identity, err = groupHasIdentity(g)
-	if err != nil {
-		return err
+	var identity Element
+	if identity, err = groupHasIdentity(g); err != nil {
+		g.identity = identity
+		return
 	}
 
-	_, err = groupHasInverses(g)
-	if err != nil {
-		return err
+	var ok bool
+	if ok, err = groupHasInverses(g); err != nil || !ok {
+		return
 	}
 
-	return nil
+	return
 }
 
 // Details prints all know details of the Group
@@ -131,16 +133,15 @@ func (g *Group) Details() {
 // to look up values if the operation has been performed before
 func (g *Group) Operate(a, b Element) Element {
 
-	_, isIn := g.cayleytable[a]
-	if !isIn {
+	if _, ok := g.cayleytable[a]; !ok {
 		return g.operator(a, b)
 	}
 
-	value, isIn := g.cayleytable[a][b]
-	if isIn {
+	if value, ok := g.cayleytable[a][b]; ok {
 		return value
 	}
 
+	// operation not cached, calculate it
 	return g.operator(a, b)
 }
 
