@@ -1,98 +1,13 @@
 package groups
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/wwestgarth/group-theory/primality"
 )
 
-var (
-
-	// ErrorOpFailed generic specified error
-	ErrGroupOpFailed = errors.New("group Operation failed")
-	// ErrorNotClosed Groups is not closed
-	ErrNotClosed = errors.New("group is not closed")
-	// ErrorNoIdentity Group does not have an Identity
-	ErrNoIdentity = errors.New("group does not have an Identity")
-	// ErrorNoInverse Group element does not have an inverse
-	ErrNoInverse = errors.New("group element does not have an inverse")
-)
-
-// Element An abstracted group element
-type Element interface {
-}
-
-// GroupOperation An abtracted group operation defined on two group elements
-type GroupOperation func(Element, Element) Element
-
-// GroupEquals An abstracted equality functions defined on two group elements
-type GroupEquals func(Element, Element) bool
-
-// Group Structure which defines a Group
-type Group struct {
-	elements   map[Element]bool
-	operator   GroupOperation
-	equals     GroupEquals
-	generators []Element
-	identity   Element
-	table      *cayleyTable
-}
-
-// New returns a new instance of a Group. Requires an Groups operation
-// and a means of element equality.
-func New(op *GroupOperation, eq *GroupEquals) Group {
-	var g Group
-	g.elements = make(map[Element]bool)
-	g.operator = *op
-	g.equals = *eq
-	g.table = newCayleyTable()
-	return g
-}
-
-// New returns a new instance of a Group. Requires an Groups operation
-// and a means of element equality.
-func NewGroup(op *GroupOperation, eq *GroupEquals, elements []Element) (g Group) {
-
-	g.operator = *op
-	g.equals = *eq
-
-	g.elements = make(map[Element]bool)
-	g.table = newCayleyTable()
-
-	// Fill in elements
-	for _, element := range elements {
-		g.elements[element] = true
-	}
-
-	return g
-}
-
-// New returns a new instance of a Group. Requires an Groups operation
-// and a means of element equality.
-func NewGroupFromGenerator(op *GroupOperation, eq *GroupEquals, generator Element, maxOrder uint32) (g Group) {
-	g = New(op, eq)
-	g.Generate(generator, maxOrder)
-
-	return
-}
-
-// Operate executes the Group's registered operator, using the Cayley Table
-// to look up values if the operation has been performed before
-func (g *Group) Operate(a, b Element) (value Element) {
-
-	value, err := g.table.lookup(a, b)
-	if err != nil {
-		value = g.operator(a, b)
-	}
-
-	return
-}
-
-// Generate Attempts to generates a group from the given generator. If more
+// generate Attempts to generates a group from the given generator. If more
 // than 'max_order' elements are added to the Group then we group generate
 // is stopped.
-func (g *Group) Generate(generator Element, maxOrder uint32) (err error) {
+func (g *Group) generate(generator Element, maxOrder uint32) (err error) {
 
 	var current = generator
 
@@ -102,7 +17,7 @@ func (g *Group) Generate(generator Element, maxOrder uint32) (err error) {
 		g.elements[current] = true
 		current = g.Operate(generator, current)
 
-		if g.equals(generator, current) {
+		if g.Equals(generator, current) {
 			found = true
 			break
 		}
@@ -127,13 +42,13 @@ func (g *Group) isGenerator(e Element) (generator bool) {
 	for i := 0; i < len(g.elements)-1; i++ {
 
 		current = g.Operate(e, current)
-		if g.equals(e, current) {
+		if g.Equals(e, current) {
 			return // generator of sub-group
 		}
 	}
 
 	current = g.Operate(e, current)
-	generator = g.equals(e, current)
+	generator = g.Equals(e, current)
 	return
 }
 
@@ -183,19 +98,4 @@ func (g *Group) Validate() (result *GroupValidateResult, err error) {
 		Generators:   g.generators[:],
 	}
 	return
-}
-
-type GroupValidateResult struct {
-	Order        uint32
-	Identity     Element
-	Generators   []Element
-	HasSubgroups bool
-}
-
-// Details prints all know details of the Group
-func (g *Group) Details() {
-	fmt.Println("Group Details")
-	fmt.Println("Order     :", len(g.elements))
-	fmt.Println("Generators:", g.generators)
-	fmt.Println("Identity  :", g.identity)
 }
