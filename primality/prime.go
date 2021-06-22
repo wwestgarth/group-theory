@@ -1,7 +1,6 @@
 package primality
 
 import (
-	"fmt"
 	"math/rand"
 )
 
@@ -11,11 +10,6 @@ var (
 
 // getRandom returns a pseudo-random int in the range (min, max)
 func getRandom(min, max int) int {
-	if max <= min {
-		// Really shouldn't get here
-		panic(fmt.Sprintf("[%d %d) is not a valid in-zer0 interval", min, max))
-	}
-
 	// Move interval to [0, n)
 	return rand.Intn(max-min) + min
 }
