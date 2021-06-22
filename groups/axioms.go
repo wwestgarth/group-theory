@@ -4,13 +4,16 @@ package groups
 // by the Group's Operator is closed
 func (g *Group) isClosed() (err error) {
 
-	err = ErrNotClosed
+	// This is a bit rough
+	// Could improve performance if we assume communitive? But otherwise, by definition,
+	// we have to check all pairs
 	for element1 := range g.elements {
 		for element2 := range g.elements {
 
 			res := g.Operate(element1, element2)
 
 			if !g.elements[res] {
+				err = ErrNotClosed
 				return
 			}
 
@@ -18,7 +21,6 @@ func (g *Group) isClosed() (err error) {
 		}
 	}
 
-	err = nil
 	return
 }
 
@@ -28,7 +30,7 @@ func (g *Group) isClosed() (err error) {
 // must divide the group order, for finite groups the order cannot be infinity
 // and so it must be 1, and thus the identity element.
 func (g *Group) isIdentity(e Element) bool {
-	return g.equals(e, g.Operate(e, e))
+	return g.Equals(e, g.Operate(e, e))
 }
 
 // groupHasIdentity Checks and returns the identity element of the suspected group
@@ -60,7 +62,7 @@ func findInverseElement(g *Group, e Element) (inverse Element, err error) {
 	}
 
 	// given element is identity
-	if g.equals(g.identity, e) {
+	if g.Equals(g.identity, e) {
 		inverse = e
 		return
 	}
@@ -69,7 +71,7 @@ func findInverseElement(g *Group, e Element) (inverse Element, err error) {
 
 		res := g.Operate(e, element1)
 
-		if g.equals(res, g.identity) {
+		if g.Equals(res, g.identity) {
 			inverse = element1
 			return
 		}

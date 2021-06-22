@@ -17,26 +17,28 @@ func printResults(name string, result *groups.GroupValidateResult) {
 
 }
 
+type Zn struct {
+	modulus int
+}
+
+func (z *Zn) Operate(a, b groups.Element) groups.Element {
+	bValue, _ := b.(int) // proper handle if type assertion fails
+	aValue, _ := a.(int)
+	return (aValue + bValue) % z.modulus
+}
+
+func (z *Zn) Equals(a, b groups.Element) bool {
+	aValue, aOk := a.(int)
+	bValue, bOk := b.(int)
+	return aOk && bOk && aValue == bValue
+}
+
 func generatedZNGroup(zN int) {
 
-	// Make our group operations
-	gOp := groups.GroupOperation(
-		func(a, b groups.Element) groups.Element {
-			bValue, _ := b.(int) // proper handle if type assertion fails
-			aValue, _ := a.(int)
-			return (aValue + bValue) % zN
-		})
-
-	gEq := groups.GroupEquals(
-		func(a, b groups.Element) bool {
-			aValue, aOk := a.(int)
-			bValue, bOk := b.(int)
-			return aOk && bOk && aValue == bValue
-		})
-
-	generated := groups.NewGroupFromGenerator(&gOp, &gEq, 1, 10)
+	generated := groups.NewGroupFromGenerator(&Zn{zN}, 1, 500)
 	result, err := generated.Validate()
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
@@ -46,7 +48,9 @@ func generatedZNGroup(zN int) {
 
 func main() {
 
-	generatedZNGroup(6)
 	generatedZNGroup(5)
+	generatedZNGroup(6)
+	generatedZNGroup(257) // prime group
+	generatedZNGroup(360)
 
 }
